@@ -19,6 +19,7 @@ interface
 
         tPilaEnterosExt = record
             pila: ^tNodo;
+            cT: integer;
         end;
 
 
@@ -72,6 +73,7 @@ implementation
     procedure initialize(var p: tPilaEnterosExt);
     begin
         p.pila := nil; { Inicializa el cima de la pila a nil }
+        p.cT:= 0;
     end;
 
     { Devuelve true si la pila esta vacia }
@@ -89,6 +91,7 @@ implementation
         nuevo^.info := x;  { Asigna el valor al nuevo nodo }
         nuevo^.ant := p.pila; { Enlaza el nuevo nodo con la anterior cima }
         p.pila := nuevo;   { Actualiza la cima de la pila }
+        p.cT:= p.cT+1;
     end;
 
     { Elimina el elemento del cima de la pila }
@@ -101,6 +104,7 @@ implementation
             aux := p.pila;      { Guarda la cima de la pila en un nodo auxiliar }
             p.pila := p.pila^.ant; { Actualiza la cima de la pila }
             dispose(aux);        { Libera la memoria del nodo eliminado }
+            p.cT:= p.cT-1;
         end;
     end;
 
@@ -163,6 +167,15 @@ implementation
     function contarElementos(p: tPilaEnterosExt): integer;
     begin
         WriteLn('Implementa la función contarElementos');
+        {
+        contarElementos:= 0;
+        while p <> NIL do
+        begin
+            contarElementos:= contarElementos + 1;
+            p:= p^.ant;
+        end;
+        }
+        contarElementos:= p.cT;
     end;
 
     { 
@@ -177,8 +190,20 @@ implementation
             - ultimo([1, 2, 3]) -> 3
     }
     function ultimo(p: tPilaEnterosExt): integer;
+    var
+        i: integer;
     begin
         WriteLn('Implementa la función ultimo');
+        if p.pila <> NIL then
+        begin
+          for i := 1 to p.cT-1 do
+             begin
+               p.pila := p.pila^.ant;
+             end;
+          ultimo:= p.pila^.info;
+        end
+        else
+          ultimo:= 0;
     end;
 
     { 
@@ -194,8 +219,24 @@ implementation
             - combinar([1, 2, 3], []) -> [1, 2, 3]
     }
     procedure combinar(var p1, p2: tPilaEnterosExt);
+    var
+    aux: ^tNodo;
+    i: integer;
     begin
         WriteLn('Implementa la función combinar');
+        aux:= p2.pila;
+        if p2.pila <> NIL then
+        begin
+          for i := 1 to p2.cT-1 do
+             begin
+               p2.pila := p2.pila^.ant;
+             end;
+          p2.pila^.ant:= p1.pila;
+          p2.pila:= NIL;
+          p1.pila:= aux;
+          p1.cT:= p2.cT+p1.cT;
+        end;
+        clear(p2);
     end;
 
     { 
@@ -210,8 +251,14 @@ implementation
             - popN([1, 2, 3, 4, 5], 0) -> [1, 2, 3, 4, 5]
     }
     procedure popN(var p: tPilaEnterosExt; n: integer);
+    var
+       i: integer;
     begin  
         WriteLn('Implementa la función popN');
+        for i:=0 to n-1 do
+           begin
+             pop(p)
+           end;
     end;
 
     { 
@@ -226,8 +273,23 @@ implementation
             - sumarN([1, 2, 3, 4, 5], 0) -> [1, 2, 3, 4, 5]
     }
     procedure sumarN(var p: tPilaEnterosExt; n: integer);
+    var
+       suma,i: integer;
+       aux: ^tNodo;
     begin
         WriteLn('Implementa la función sumarN');
+        suma:= 0;
+        aux:= p.pila;
+        if n <> 0 then
+        begin
+        for i:= 0 to n-1 do
+           begin
+               suma:= suma+aux^.info;
+               aux:= aux^.ant;
+           end;
+        popN(p,n);
+        push(p,suma);
+        end;
     end;
 
     { 
@@ -241,8 +303,21 @@ implementation
             - invertir([1, 2, 3]) -> [3, 2, 1]
     }
     procedure invertir(var p: tPilaEnterosExt);
+    var
+       auxP: tPilaEnterosExt;
     begin
         WriteLn('Implementa la función invertir');
+        if not isEmpty(p) then
+        begin
+        initialize(auxP);
+             while p.cT > 0 do
+             begin
+                 push(auxP,p.pila^.info);
+                 pop(p)
+             end;
+        p:= auxP;
+        end;
+
     end;
 
     { 
@@ -272,8 +347,21 @@ implementation
             - contarApariciones([1, 2, 3, 4, 5, 2], 2) -> 2
     }
     function contarApariciones(var p: tPilaEnterosExt; n: integer): integer;
+    var
+       aux: ^tNodo;
+       i: integer;
     begin
         WriteLn('Implementa la función contarApariciones');
+        aux:= p.pila;
+        contarApariciones:= 0;
+        for i:= 0 to p.cT-1 do
+           begin
+               if aux^.info = n then
+               begin
+                    contarApariciones:= contarApariciones+1;
+               end;
+           aux:= aux^.ant;
+           end;
     end;
 
 end.
