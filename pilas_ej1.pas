@@ -1,15 +1,15 @@
-program pilas_ej1;
+program balanceada2;
 
 uses
-    sysutils, 
-    uPilaChar; { 1.1 Genera una unidad pila cuyos nodos almacenen un único carácter.}
+    sysutils,
+    Unit1; { 1.1 Genera una unidad pila cuyos nodos almacenen un único carácter.}
 
 
 { 1.2
     Define una función balanceada para comprobar el balance de paréntesis de una expresión aritmética.
     Una expresión aritmética está balanceada si cada paréntesis de apertura tiene un paréntesis de cierre correspondiente.
     Los paréntesis deben estar correctamente anidados.
-    No se comprobará si los paréntesis están en el lugar correcto (por ejemplo, (3+2*)5 o 3(+4-)2 no es una expresión aritmética 
+    No se comprobará si los paréntesis están en el lugar correcto (por ejemplo, (3+2*)5 o 3(+4-)2 no es una expresión aritmética
     válida pero vamos a considerarla balanceada).
     - Entradas:
         - Una cadena de caracteres que representa una expresión aritmética.
@@ -59,24 +59,81 @@ const
     resultado8 = false;
     expresion9 = '[3[+2]*5)+[4-2]';
     resultado9 = false;
-    expresion10 = '(3[+2]*5(+[4-2]';
+    expresion10 = '([)]';
     resultado10 = false;
     expresion11 = '(3[+2]*5)+[4-2]';
     resultado11 = true;
 
 { 1.2}
 function balanceada(exp: string): boolean;
+VAR
+  i: integer;
+  Pn: PunteroCima;
 begin
     WriteLn('Implementa la función balanceada');
-    balanceada := false;
+    balanceada := true;
+    inicialization(Pn);
+    i:= 1;
+    while (i <= length(exp)) and (balanceada) do
+    begin
+         if exp[i] = '(' then
+             begin
+               push(Pn,'(');
+             end
+         else if (exp[i] = ')') and (not isEmpty(Pn)) then
+             begin
+               pop(Pn);
+             end
+         else if (exp[i] = ')') and isEmpty(Pn) then
+             begin
+               balanceada:= false;
+             end;
+         i:= i + 1;
+    end;
+    balanceada:= balanceada and isEmpty(Pn);
 end;
 
 
 { 1.3}
 function balanceadaCorchetes(exp: string): boolean;
+VAR
+  i: integer;
+  Pn: PunteroCima;
 begin
     WriteLn('Implementa la función balanceadaCorchetes');
-    balanceadaCorchetes := false;
+    balanceadaCorchetes := true;
+    inicialization(Pn);
+    i:= 1;
+    while (i <= length(exp)) and (balanceadaCorchetes) do
+    begin
+         if (exp[i] = '(') or (exp[i] = '[') then
+             begin
+               push(Pn,exp[i]);
+             end
+         else if (exp[i] = ')') and (not isEmpty(Pn)) and (peek(Pn) = '(') then
+             begin
+               pop(Pn);
+             end
+         else if (exp[i] = ']') and (not isEmpty(Pn)) and (peek(Pn) = '[') then
+             begin
+               pop(Pn);
+             end
+         else if ((exp[i] = ')') or (exp[i] = ']')) and isEmpty(Pn) then
+             begin
+               balanceadaCorchetes:= false;
+             end
+         else if (exp[i] = ')') and (peek(Pn) <> '(') then
+             begin
+               balanceadaCorchetes:= false;
+             end
+         else if (exp[i] = ']') and (peek(Pn) <> '[') then
+             begin
+               balanceadaCorchetes:= false;
+             end;
+
+         i:= i + 1;
+    end;
+    balanceadaCorchetes:= balanceadaCorchetes and isEmpty(Pn);
 end;
 
 function showOkWrong(ok: boolean): string;
@@ -104,9 +161,7 @@ begin
     WriteLn('Ejemplo 11: ', expresion11, #9, balanceadaCorchetes(expresion11), ' = ', resultado11, #9, showOkWrong(balanceadaCorchetes(expresion11) = resultado11));
     readln;
 end.
-
-
-
+        
 
     
 
